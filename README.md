@@ -28,4 +28,7 @@ chainlit run app.py
 
 # code change
 chainlit run app.py -w
+
+# local ollama
+chainlit run local_ollama.py -w
 ```

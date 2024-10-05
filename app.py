@@ -100,8 +100,8 @@ async def main(message):
         source_names = [text_el.name for text_el in text_elements]
 
         if source_names:
-            answer += f"\nSources: {', '.join(source_names)}"
+            answer += f"\n\nSources: {', '.join(source_names)}"
         else:
-            answer += "\nNo sources found"
+            answer += "\n\nNo sources found"
 
     await cl.Message(content=answer, elements=text_elements).send()
