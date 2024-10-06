@@ -94,7 +94,7 @@ async def start():
 @cl.on_message
 async def main(message):
 
-    text_elements = []  # type: List[cl.Text]
+    text_elements = []
     msg = cl.Message(content="", elements=text_elements)
     await msg.send()
 
@@ -104,12 +104,7 @@ async def main(message):
     question = message.content
     docs = retriever.invoke(question)
     docs_txt = format_docs(docs)
-
     rag_prompt_formatted = rag_prompt.format(context=docs_txt, question=question)
-    answer = llm.invoke([HumanMessage(content=rag_prompt_formatted)])
-    print("answer:", answer, "type:", type(answer))
-
-    await msg.stream_token(answer)
 
     text_elements = format_elements(docs)
     await cl.Message(
@@ -117,4 +112,10 @@ async def main(message):
         elements=text_elements,
     ).send()
 
-    await msg.update()
+    # cl.make_async function is used to convert a synchronous function into an asynchronous one
+    # which is particularly useful when you need to run blocking code (such as API calls or computations) in an asynchronous context.
+    for chunk in await cl.make_async(llm.invoke)(
+        [HumanMessage(content=rag_prompt_formatted)]
+    ):
+        await msg.stream_token(chunk)
+    await msg.send()
